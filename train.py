@@ -65,7 +65,7 @@ WORK_DIR = 'data-lyrics'
 #WORK_DIR = 'data-eminescu'
 
 nn_config = {
-    'init_scale' = 0.04,
+    'init_scale' : 0.04,
     'max_grad_norm': 10,
     'num_layers': 2,
     'num_steps': 35,
