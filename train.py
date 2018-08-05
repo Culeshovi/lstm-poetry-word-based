@@ -109,7 +109,7 @@ def run_epoch(session, m, data, eval_op, verbose=False):
 def main():
 	config = namedtuple('TrainConfig', train_config.keys())(*train_config.values())
 	model_config = namedtuple('ModelConfig', nn_config.keys())(*nn_config.values())
-	with open(os.path.join(WORK_DIR, 'config.json'), 'wb') as fh:
+	with open(os.path.join(WORK_DIR, 'config.pickle'), 'wb') as fh:
 		pickle.dump(nn_config, fh)
 	proc = reader.TextProcessor.from_file(os.path.join(WORK_DIR, 'input.txt'))
 	proc.create_vocab(model_config.vocab_size)
