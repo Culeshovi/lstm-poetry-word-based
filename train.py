@@ -16,6 +16,7 @@ from collections import namedtuple
 import json
 import glob
 
+import pickle
 '''
     Small config:
     init_scale = 0.1
@@ -64,21 +65,21 @@ WORK_DIR = 'data-lyrics'
 #WORK_DIR = 'data-eminescu'
 
 nn_config = {
-    'init_scale': 0.1,
-    'max_grad_norm': 5,
+    'init_scale' = 0.04,
+    'max_grad_norm': 10,
     'num_layers': 2,
-    'num_steps': 30,
-    'hidden_size': 400,
-    'keep_prob': .6,
+    'num_steps': 35,
+    'hidden_size': 2000,
+    'keep_prob': .35,
     'batch_size': 20,
     'vocab_size': 15000
 }
 
 train_config = {
-    'max_max_epoch': 50,
-    'max_epoch': 40,
+    'max_max_epoch': 100,
+    'max_epoch': 100,
     'learning_rate': 1.0,
-    'lr_decay': 0.6
+    'lr_decay': 1 / 1.15
 }
 
 
@@ -107,19 +108,12 @@ def run_epoch(session, m, data, eval_op, verbose=False):
 
 def main():
 
-    # cleanup input dir
-    ret = raw_input('Are you sure you want to clean %s [yes|no] ' % (WORK_DIR,))
-    if ret == 'yes':
-        for f in glob.glob(os.path.join(WORK_DIR, '*')):
-            if not f.endswith('.txt'):
-                os.remove(f)
-                print(f + ' deleted')
-
-    config = namedtuple('TrainConfig', train_config.keys())(*train_config.values())
+	config = namedtuple('TrainConfig', train_config.keys())(*train_config.values())
     model_config = namedtuple('ModelConfig', nn_config.keys())(*nn_config.values())
 
     with open(os.path.join(WORK_DIR, 'config.json'), 'wb') as fh:
-        json.dump(nn_config, fh)
+    	pickle.dump(nn_config, fh)
+
 
     proc = reader.TextProcessor.from_file(os.path.join(WORK_DIR, 'input.txt'))
     proc.create_vocab(model_config.vocab_size)
