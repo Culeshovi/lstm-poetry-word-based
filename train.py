@@ -111,7 +111,9 @@ def main():
 	model_config = namedtuple('ModelConfig', nn_config.keys())(*nn_config.values())
 	with open(os.path.join(WORK_DIR, "config.pickle"), "wb") as fh:
 		pickle.dump(nn_config, fh)
-	proc = reader.TextProcessor.from_file(os.path.join(WORK_DIR, 'input.txt'))
+	os.chdir('data-lyrics')
+	proc = reader.TextProcessor.from_file('input.txt')
+	os.chdir('..')
 	proc.create_vocab(model_config.vocab_size)
 	train_data = proc.get_vector()
 	np.save(os.path.join(WORK_DIR, 'vocab.npy'), np.array(proc.id2word))
