@@ -112,7 +112,7 @@ def main():
 	with open(os.path.join(WORK_DIR, "config.pickle"), "wb") as fh:
 		pickle.dump(nn_config, fh)
 	os.chdir('data-lyrics')
-	proc = reader.TextProcessor.from_file('input.txt')
+	proc = reader.TextProcessor.from_file(os.path.join(WORK_DIR, 'input.txt'))
 	os.chdir('..')
 	proc.create_vocab(model_config.vocab_size)
 	train_data = proc.get_vector()
