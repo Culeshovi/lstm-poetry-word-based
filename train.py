@@ -111,34 +111,27 @@ def main():
 	model_config = namedtuple('ModelConfig', nn_config.keys())(*nn_config.values())
 	with open(os.path.join(WORK_DIR, 'config.json'), 'wb') as fh:
 		pickle.dump(nn_config, fh)
-
-
-    proc = reader.TextProcessor.from_file(os.path.join(WORK_DIR, 'input.txt'))
-    proc.create_vocab(model_config.vocab_size)
-    train_data = proc.get_vector()
-    np.save(os.path.join(WORK_DIR, 'vocab.npy'), np.array(proc.id2word))
-    proc.save_converted(os.path.join(WORK_DIR, 'input.conv.txt'))
-
-    with tf.Graph().as_default(), tf.Session() as session:
-        initializer = tf.random_uniform_initializer(-model_config.init_scale,
+	proc = reader.TextProcessor.from_file(os.path.join(WORK_DIR, 'input.txt'))
+	proc.create_vocab(model_config.vocab_size)
+	train_data = proc.get_vector()
+	np.save(os.path.join(WORK_DIR, 'vocab.npy'), np.array(proc.id2word))
+	proc.save_converted(os.path.join(WORK_DIR, 'input.conv.txt'))
+	with tf.Graph().as_default(), tf.Session() as session:
+		initializer = tf.random_uniform_initializer(-model_config.init_scale,
                                                     model_config.init_scale)
-        with tf.variable_scope('model', reuse=None, initializer=initializer):
-            m = model.Model(is_training=True, config=model_config)
-
-        tf.initialize_all_variables().run()
-        saver = tf.train.Saver(tf.all_variables())
-
-        for i in range(config.max_max_epoch):
-            lr_decay = config.lr_decay ** max(i - config.max_epoch, 0.0)
-            m.assign_lr(session, config.learning_rate * lr_decay)
-
-            print("Epoch: %d Learning rate: %.3f" % (i + 1, session.run(m.lr)))
-            train_perplexity = run_epoch(session, m, train_data, m.train_op,
+		with tf.variable_scope('model', reuse=None, initializer=initializer):
+			m = model.Model(is_training=True, config=model_config)
+		tf.initialize_all_variables().run()
+		saver = tf.train.Saver(tf.all_variables())
+		for i in range(config.max_max_epoch):
+			lr_decay = config.lr_decay ** max(i - config.max_epoch, 0.0)
+			m.assign_lr(session, config.learning_rate * lr_decay)
+			print("Epoch: %d Learning rate: %.3f" % (i + 1, session.run(m.lr)))
+			train_perplexity = run_epoch(session, m, train_data, m.train_op,
                                          verbose=True)
-            print("Epoch: %d Train Perplexity: %.3f" % (i + 1, train_perplexity))
-
-            ckp_path = os.path.join(WORK_DIR, 'model.ckpt')
-            saver.save(session, ckp_path, global_step=i)
+			print("Epoch: %d Train Perplexity: %.3f" % (i + 1, train_perplexity))
+			ckp_path = os.path.join(WORK_DIR, 'model.ckpt')
+			saver.save(session, ckp_path, global_step=i)
 
 
 if __name__ == "__main__":
